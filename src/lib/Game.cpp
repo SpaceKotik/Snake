@@ -1,15 +1,13 @@
-#include <climits>
 #include <random>
 #include <cstdlib>
 #include <ctime>
+#include <climits>
 #include "../headers/Game.hpp"
 #include "../headers/Ui.hpp"
 #include "../headers/Snake.hpp"
 
-
 static std::random_device rseed;
 static std::mt19937 rgen(rseed());
-
 
 Game::Game() {
     Ui::get()->setTimer(TICK, std::bind(&Game::move, this));
@@ -23,9 +21,10 @@ bool Game::isOnField(Vector coord) {
 }
 
 Vector Game::getRandomPoint() {
-    srand(std::time(nullptr));
     //std::uniform_int_distribution<int> xdist(2, Ui::get()->get_width()  - 3);
     //std::uniform_int_distribution<int> ydist(2, Ui::get()->get_height() - 3);
+
+    srand(std::time(nullptr));
 
     Vector xy;
     do {
@@ -45,37 +44,37 @@ void Game::draw() {
     ui->drawAll();
 
     ///Draw snakes
-    for (const Snake &sn : snakes) {
-        SnakeState snakeDirection = sn.dir;
-        for (const auto &elem : sn.body) {
-            ui->draw({elem, sn.id, snakeDirection});
+    for (const Snake &snake : snakes) {
+        SnakeState snakeDirection = snake.dir;
+        for (const auto &elem : snake.body) {
+            ui->draw({elem, snake.id, snakeDirection});
             snakeDirection = SnakeState::BODY;
         }
-        ui->draw(sn.id, sn.body.size());
+        ui->draw(snake.id, snake.body.size());
     }
     ///Draw rabbits
-    for (const Rabbit &rab : rabbits)
+    for (const auto &rab : rabbits)
         ui->draw(rab);
 }
 
 std::optional<Vector> Game::nearestRabbit(Vector pos) {
-    std::optional<Vector> near;
-    //TODO: repair controllers and change to smth like 5-10
-    int distance = 1000;
+    std::optional<Vector> nearest;
+    //TODO: fix AI controllers and change it
+    int maxDistance = 1000;
     ///Find nearest rabbit which is now further than INT_MAX
-    for (auto const &rab : rabbits) {
+    for (const auto &rab : rabbits) {
         int dist = rab.dist(pos);
 
-        if (dist < distance) {
-            distance = dist;
-            near = rab;
+        if (dist < maxDistance) {
+            maxDistance = dist;
+            nearest = rab;
         }
     }
-    return near;
+    return nearest;
 }
 
 void Game::move() {
-    Ui::get()->setTimer(TICK, std::bind(&Game::move, this));
+    //Ui::get()->setTimer(TICK, std::bind(&Game::move, this));
 
     for (Snake &sn : snakes)
         sn.move(rabbits);

@@ -43,7 +43,7 @@ void AIController::onTick() {
     if (isDead)
         return;
 
-    Ui::get()->setTimer(Game::TICK, std::bind(&AIController::onTick, this));
+    //Ui::get()->setTimer(Game::TICK, std::bind(&AIController::onTick, this));
 
     SnakeState d[] = {SnakeState::HEAD_UP, SnakeState::HEAD_DOWN, SnakeState::HEAD_LEFT, SnakeState::HEAD_RIGHT};
 
@@ -51,16 +51,18 @@ void AIController::onTick() {
     auto rabbit = game.nearestRabbit(head);
 
     if (rabbit.has_value()) {
-        for (int i = 0; i < 4; ++i) {
-            dir = d[i];
+        for (const auto &i : d) {
+            dir = i;
             if (!checkIfLost(this->next()) && rabbit->dist(this->next()) <= rabbit->dist(head))
                 return;
         }
     }
 
-    for (int i = 0; i < 4; ++i) {
-        dir = d[i];
+    for (const auto &i : d) {
+        dir = i;
         if (!checkIfLost(this->next()))
             return;
     }
+
+
 }

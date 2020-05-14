@@ -14,7 +14,7 @@ private:
     bool running = true;
 
     std::vector<EventFunc> events;
-    std::vector<std::pair<int, TimerFunc>> timers;
+    std::vector<std::tuple<int, int, TimerFunc>> timers;
 
     static void clearWindow();                       ///Clears window
     static void putChar(int x, int y, char c);

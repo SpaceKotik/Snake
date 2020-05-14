@@ -15,11 +15,11 @@ public:
     std::list<Vector> body;
     bool isDead;
 
-    explicit Snake(Game &);
+    explicit Snake(Game& game);
 
-    Snake(const Snake &) = delete;
+    Snake(const Snake& snake) = delete;
 
-    Snake &operator=(const Snake &) = delete;
+    Snake &operator=(const Snake& snake) = delete;
 
     Vector next();
 

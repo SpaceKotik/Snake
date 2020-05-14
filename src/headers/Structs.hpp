@@ -23,7 +23,8 @@ struct Vector : public std::pair<int, int> {
 };
 
 struct BodyPart : Vector {
-    BodyPart(const Vector &coord, int id, SnakeState snakeDir) : Vector(coord), id(id), dir(snakeDir) {}
+    //BodyPart(const Vector &coord, int id, SnakeState snakeDir) : Vector(coord), id(id), dir(snakeDir) {}
+
     int id;
     SnakeState dir;
 };

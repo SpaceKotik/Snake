@@ -35,13 +35,13 @@ TextUi::TextUi() {
 
     updateWindowSize();
     ///buffer is not being used
-    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stdout, nullptr, _IONBF, 0);
 }
 
 TextUi::~TextUi() {
     clearWindow();
     resetSignals();
-    setvbuf(stdout, NULL, _IOLBF, 0);
+    setvbuf(stdout, nullptr, _IOLBF, 0);
     printf("Well played :)\n");
 }
 
@@ -106,11 +106,11 @@ void TextUi::setEvent(EventFunc eventFunc) {
 }
 
 void TextUi::setTimer(int time, TimerFunc timerFunc) {
-    timers.emplace_back(std::max(0, time), timerFunc);
+    timers.emplace_back(std::max(0, time), std::max(0, time), timerFunc);
     ///Sort times from smallest to biggest
     std::sort(timers.begin(), timers.end(),
               [](const auto &a, const auto &b) {
-                  return a.first < b.first;
+                  return std::get<0>(a) < std::get<0>(b);
     });
 }
 
@@ -146,7 +146,7 @@ void TextUi::run(Game &game) {
 
         int minSecs = -1;
         if (!timers.empty())
-            minSecs = timers.front().first;
+            minSecs = std::get<0>(timers.front());
 
         struct timespec ta, tb;
         clock_gettime(CLOCK_MONOTONIC, &ta);
@@ -157,16 +157,18 @@ void TextUi::run(Game &game) {
 
         ///If there are some subscribers in timers
         if (minSecs != -1) {
-            auto smallestTimer = timers.begin();
-            auto smallestTimerEvent = smallestTimer->second;
             ///Reduce time in every timer
-            for (auto &t : timers)
-                t.first = std::max(0, t.first - elapsed);
-            ///If the timer's event must have happened, erase it and make call event
-            if (minSecs <= elapsed) {
-                timers.erase(smallestTimer);
-                smallestTimerEvent();
+            for (auto &t : timers) {
+                std::get<0>(t) = std::max(0, std::get<0>(t) - elapsed);
             }
+            ///If the timer's event must have happened, erase it and make call event
+            for (auto &t : timers) {
+                if (std::get<0>(t) <= 0) {
+                    std::get<0>(t) = std::get<1>(t);
+                    std::get<2>(t)();
+                }
+            }
+
         }
 
         if (eventsFound == 1)
